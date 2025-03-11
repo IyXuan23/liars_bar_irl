@@ -15,10 +15,6 @@ game = LiarsBar()
 def home():
     return render_template('home.html')
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
 @socketio.on('message')
 def handle_message(data):
     print(f"received message: {data}")
