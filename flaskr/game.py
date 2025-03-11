@@ -7,8 +7,11 @@ class LiarsBar:
         self.players = []
         self.deck = self.create_deck()
         self.state = 'waiting'
+        self.active_player = None
 
-        self.readyNumber = 0
+        self.ready_number = 0
+
+        self.round_end = False
 
     #creates deck of 6A, 6Q, 6K, 2Joker
     def create_deck(self):
@@ -28,9 +31,9 @@ class LiarsBar:
 
     def deal_cards(self):
         for player in self.players:
-            player.cards = deck[0:5]
+            player.cards = self.deck[0:5]
         
-        deck = deck[5:]
+        self.deck = self.deck[5:]
 
     def add_player(self, player):
 
@@ -39,6 +42,14 @@ class LiarsBar:
             return True
         
         return False
+
+    def start_game(self):
+
+        while not self.round_end():
+
+            active_player
+
+
 
 class Player:
 

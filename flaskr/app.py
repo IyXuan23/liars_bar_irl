@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from flask.socketio import SocketIO, emit
+from flask.socketio import SocketIO, emit, join_room, leave_room
 from game import LiarsBar, Player
 
 
@@ -15,15 +15,18 @@ game = LiarsBar()
 def home():
     return render_template('home.html')
 
-@socketio.on('message')
+@socketio.on('test')
 def handle_message(data):
-    print(f"received message: {data}")
+
+    msg = data.get('msg')
+
+    print(f"received message: {msg}")
     emit('response', {'message': 'hello world!'})
 
 
 #code for adding a player to the lobby
 @socketio.on('add_player')
-def handle_add_player(player):
+def handle_add_player(data):
     player_name = data.get('name')
     player = Player(player_name)
 
@@ -32,17 +35,17 @@ def handle_add_player(player):
     else:
         emit('error', {'message': 'lobby is full'})
 
-    emit('game_state', game.get_game_state(), broadcast=True)
+    emit('game_state', {'message': f'game is {game.state}'}, broadcast=True)
 
 @socketio.on('player_ready')
 def handle_player_ready(data):
-    game.readyNumber += 1
-    if game.readyNumber == len(game.players):
+    game.ready_number += 1
+    if (len(game.players) > 1) and (game.ready_number == len(game.players)):
         handle_start_game()
 
 @socketio.on('player_unready')
 def handle_player_unready(data):
-    game.readyNumber -= 1
+    game.ready_number -= 1
 
 def handle_start_game():
     if len(game.players < 2):
@@ -51,6 +54,9 @@ def handle_start_game():
         game.start_game()
         emit('game_started', {'message': 'game start!'})
         emit('game_state', game.get_game_state(), broadcast=True)
+
+# @socketio.on('make_move')
+# def handle_move(data):
 
 if name == '__main__':
     socketio.run(app, debug=True)
