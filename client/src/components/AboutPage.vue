@@ -79,7 +79,7 @@
 }
 
 .back{
-    background-color: lightgray;
+    background-color: darkgray;
     font-size: 16px;
     border-radius: 6px;
     padding-top: 4px;
