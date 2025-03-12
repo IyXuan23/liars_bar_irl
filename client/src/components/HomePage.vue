@@ -9,16 +9,6 @@ const username = ref("")
 const isError = ref(false)
 const errorMsg = ref("Username cannot be empty")
 
-function printName() {
-
-    if (username.value.trim() === "") {
-        isError.value = true
-    } else {
-        isError.value = false
-        console.log(username.value);
-    }
-}
-
 </script>
 
 <template>
@@ -34,7 +24,7 @@ function printName() {
         <div class="columnbuttons">
             <p v-if="isError" class="errorMsg">{{ errorMsg }}</p>
             <input class='username' :class="{'inputerror': isError}" v-model="username" placeholder="Enter username"></input>
-            <button class="button" @click="printName">Join Game</button>
+            <button class="button" @click="currRouter.push({path:'/game'})">Join Game</button>
             <button class="button" @click="currRouter.push({path:'/about'})">About</button>
         </div>
     </div>
