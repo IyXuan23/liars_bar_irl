@@ -1,11 +1,14 @@
 from flask import Flask, render_template
-from flask.socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from game import LiarsBar, Player
+from flask_cors import CORS
 
 
 # instantiate the app
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins=
+                    ["http://localhost:5173", 
+                     "https://liars-bar-irl-frontend-4bezc477a-iyxuans-projects.vercel.app"])
 
 #initialise the game
 game = LiarsBar()
@@ -48,7 +51,7 @@ def handle_player_unready(data):
     game.ready_number -= 1
 
 def handle_start_game():
-    if len(game.players < 2):
+    if len(game.players) < 2:
         emit('error', {'message: not enough players'})
     else:
         game.start_game()
@@ -58,5 +61,5 @@ def handle_start_game():
 # @socketio.on('make_move')
 # def handle_move(data):
 
-if name == '__main__':
+if __name__ == '__main__':
     socketio.run(app, debug=True)
