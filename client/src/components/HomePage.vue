@@ -2,12 +2,29 @@
 
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
-
+import { getSocket, disconnectSocket } from '@/socket';
 
 const currRouter = useRouter()
 const username = ref("")
 const isError = ref(false)
 const errorMsg = ref("Username cannot be empty")
+
+//get the global socket from socket.js
+//const socket = getSocket()
+
+//check for empty name, and proceed to game page if the playerName is valid
+function joinGame() {
+
+    if (username.value.trim() === '') {
+        isError.value = true
+    }
+    else {
+        isError.value = false
+        const data = {'player': username}
+        //socket.emit('add_player', data)
+        currRouter.push({path: '/game'})
+    }
+}
 
 </script>
 
@@ -24,7 +41,7 @@ const errorMsg = ref("Username cannot be empty")
         <div class="columnbuttons">
             <p v-if="isError" class="errorMsg">{{ errorMsg }}</p>
             <input class='username' :class="{'inputerror': isError}" v-model="username" placeholder="Enter username"></input>
-            <button class="button" @click="currRouter.push({path:'/game'})">Join Game</button>
+            <button class="button" @click="joinGame">Join Game</button>
             <button class="button" @click="currRouter.push({path:'/about'})">About</button>
         </div>
     </div>
