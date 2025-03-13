@@ -1,6 +1,7 @@
 <script setup>
 
 import { getSocket, disconnectSocket } from '@/socket'
+import { ref } from 'vue'
 
 const socket = getSocket()
 
@@ -17,6 +18,26 @@ const logs = [
     {'id': 2, 'message': 'player has left'}
 ]
 
+const readyState = ref(false)
+const readyMsg = ref('Ready')
+
+const gameStart = ref(false)
+
+function toggleReady() {
+    
+    if (!readyState.value) {
+        readyState.value = true
+        readyMsg.value = 'Waiting for other players...'
+        // socket.emit('player_ready', {'message': 'ready'})
+    }
+    
+    else {
+        readyState.value = false
+        readyMsg.value = 'Ready'
+        // socket.emit('player_unready', {'message': 'unready'})
+    }
+}
+
 </script>
 
 <template>
@@ -29,9 +50,10 @@ const logs = [
                 </div>
             </div>
             <div class="buttonBox">
-                <button class="playButton">Play Cards</button>
-                <button class="callButton">Call</button>
-                <button class="quitButton">Quit Game</button>
+                <button v-if='!gameStart' class="readyButton" @click="toggleReady">{{ readyMsg }}</button>
+                <button v-if='gameStart' class="playButton">Play Cards</button>
+                <button v-if='gameStart' class="callButton">Call</button>
+                <button v-if='gameStart' class="quitButton">Quit Game</button>
             </div>
         </div>
     </div>
@@ -95,6 +117,10 @@ button {
 
 .quitButton {
     background-color: red;
+}
+
+.readyButton {
+    background-color: yellowgreen;
 }
 
 button:hover {
