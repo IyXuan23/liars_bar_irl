@@ -1,7 +1,6 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from game import LiarsBar, Player
-from flask_cors import CORS
 
 
 # instantiate the app
@@ -40,6 +39,8 @@ def handle_add_player(data):
 
     emit('game_state', {'message': f'game is {game.state}'}, broadcast=True)
 
+
+#code to check for player ready or not ready
 @socketio.on('player_ready')
 def handle_player_ready(data):
     game.ready_number += 1
@@ -50,6 +51,7 @@ def handle_player_ready(data):
 def handle_player_unready(data):
     game.ready_number -= 1
 
+#once all players are ready, automatically start the game
 def handle_start_game():
     if len(game.players) < 2:
         emit('error', {'message: not enough players'})
@@ -58,8 +60,18 @@ def handle_start_game():
         emit('game_started', {'message': 'game start!'})
         emit('game_state', game.get_game_state(), broadcast=True)
 
-# @socketio.on('make_move')
-# def handle_move(data):
+
+#when player makes a move
+@socketio.on('player_move')
+def handle_move(data):
+    if data['username'] != game.active_player:
+        print('Error: incorrect player')
+        return
+    else:
+        if data['move_type'] == 'call':
+            game.handle_move_call(data)
+        if data['move_type'] == 'play':
+            game.handle_move_play(data)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
