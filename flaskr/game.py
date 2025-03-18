@@ -1,6 +1,4 @@
 import random
-from app import socketio
-
 
 class LiarsBar:
 
@@ -11,6 +9,7 @@ class LiarsBar:
         self.players = []
         self.dead_players = []
         self.active_player = None    
+        self.previous_player = None
 
         #active cards are the current played cards, used if called out by next player
         self.active_cards = []
@@ -88,8 +87,35 @@ class LiarsBar:
                 return self.players[new_player_index]
             else:
                 new_player_index+= 1
-    
-    def handle_move_call(self, data):
+
+    #function to check whether played hand is valid
+    #if valid, return true, else return false
+    def check_valid_hand(self):
+
+        for card in self.active_cards:
+            if card == 'Joker' or card == self.current_table_type:
+                continue
+            else:
+                return False
+
+        return True
+
+
+    #if hand is valid, shoot current player
+    #if invalid, shoot previous player
+    #then reset the round
+    def handle_move_call(self):
+        
+        if self.check_valid_hand():
+            dead = self.active_player.shoot_self()
+            if dead:
+                self.dead_players.append(self.active_player)
+        else:
+            dead = self.previous_player.shoot_self()
+            if dead:
+                self.dead_players.append(self.previous_player)
+
+        #reset round
         return
 
     #update played hand, then move to the next turn player
@@ -97,31 +123,63 @@ class LiarsBar:
 
         played_hand = data['selected_cards']
         self.active_cards = played_hand
-
+        
+        self.previous_player = self.active_player
         self.active_player = self.get_next_player()
+        
+        #emit()
 
-        return
-
+    #while there is still more than 1 player alive, continue out the rounds, until
+    #the game is over
     def start_game(self):
 
         assert(self.players <= 4)
+
+        while not self.check_end_game():
+
+            self.start_round()
+
+            #temporary break
+            break
+        #game has ended
+        #emit(victory msg)
+
+    def start_round(self):
 
         self.deck = self.create_deck()
         self.shuffle_deck()
 
         self.deal_cards()
-        
-        active_player_index = 0
-        self.active_player = self.players[active_player_index]
 
-        while not self.check_end_game():
-            #proceed with the game
+        self.active_player = self.players[0]
 
-            self.new_turn_emit()
-            self.wait_player_move()
+
+    def get_emit_data(self):
+
+        data = {
+            "players": self.get_players_name(),
+            "dead_players": self.get_dead_players_name(),
+            "players_handsize": self.get_players_hand_size(),
+            "active_card_num": len(self.active_cards),
+            "current_table_type": self.current_table_type
+        }
+
+    #helper function to get the names of players for emit
+    def get_players_name(self):
+
+        player_name_list = [x.name for x in self.players]
+        return player_name_list
+    #helper function to get names of dead players for emit
+    def get_dead_players_name(self):
+
+        dead_players_name_list = [x.name for x in self.dead_players]
+        return dead_players_name_list
+    #get handsize of all players (for front end rendering)
+    def get_players_hand_size(self):
+
+        handsize_list = [len(player.cards) for player in self.players]
+        return handsize_list
             
-            break
-        
 
 
 
@@ -129,7 +187,21 @@ class LiarsBar:
 
 class Player:
 
-    def __init__(self, name):
+    def __init__(self, name, socket_id):
         self.name = name
         self.cards = []
         self.bullet_chances = 6
+        self.socket_id = socket_id
+
+    #player shoots self, if dies, return true
+    #if not, decrease bullet_chance by 1, and return false
+    def shoot_self(self):
+        
+        lst = range(0, self.bullet_chances)
+        chosen = random.choice(lst)
+
+        if chosen == 0:
+            return True
+        else:
+            self.bullet_chances -= 1
+            return False

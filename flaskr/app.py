@@ -30,7 +30,9 @@ def handle_message(data):
 @socketio.on('add_player')
 def handle_add_player(data):
     player_name = data.get('name')
-    player = Player(player_name)
+    sid = request.sid
+    print(sid)
+    player = Player(player_name, sid)
 
     if game.add_player(player):
         emit('player_added', {'message': f"player {player_name} added to game"})
