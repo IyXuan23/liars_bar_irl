@@ -5,12 +5,12 @@ import { ref } from 'vue'
 
 const socket = getSocket()
 
-// const testSend = () => {
-//     const data = {
-//         'msg': 'hello there'
-//     }
-//     socket.emit('test', data)
-// }
+const testSend = () => {
+    const data = {
+        'msg': 'hello there'
+    }
+    socket.emit('test', data)
+}
 
 //for console testing
 const logs = [
@@ -51,7 +51,7 @@ function toggleReady() {
             </div>
             <div class="buttonBox">
                 <button v-if='!gameStart' class="readyButton" @click="toggleReady">{{ readyMsg }}</button>
-                <button v-if='gameStart' class="playButton">Play Cards</button>
+                <button v-if='gameStart' class="playButton" @click="testSend">Play Cards</button>
                 <button v-if='gameStart' class="callButton">Call</button>
                 <button v-if='gameStart' class="quitButton">Quit Game</button>
             </div>

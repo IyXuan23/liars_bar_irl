@@ -100,7 +100,6 @@ class LiarsBar:
 
         return True
 
-
     #if hand is valid, shoot current player
     #if invalid, shoot previous player
     #then reset the round

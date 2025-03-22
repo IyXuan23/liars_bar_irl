@@ -4,9 +4,9 @@ let socket = null
 
 //temporary URL, to be replaced
 export const getSocket = () => {
-    // if (!socket) {
-    //     socket = io('SOME_URL');
-    // }
+    if (!socket) {
+        socket = io('https://liars-bar-irl-backend.onrender.com/');
+    }
     return socket;
 };
 
