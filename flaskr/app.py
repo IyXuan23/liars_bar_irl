@@ -7,7 +7,7 @@ from game import LiarsBar, Player
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins=
                     ["http://localhost:5173", 
-                     "https://liars-bar-irl-frontend-4bezc477a-iyxuans-projects.vercel.app"])
+                     "https://liars-bar-irl-frontend.vercel.app"])
 
 #initialise the game
 game = LiarsBar()
