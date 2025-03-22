@@ -22,7 +22,10 @@ function joinGame() {
         isError.value = false
         const data = {'name': username}
         socket.emit('add_player', data)
-        currRouter.push({path: '/game'})
+        
+        if (currRouter.currentRoute.value.path !== '/game') {
+            currRouter.push({ path: '/game' });
+        }
     }
 }
 
