@@ -63,6 +63,16 @@ class LiarsBar:
             return True
         return False
 
+    #function to remove a player from the game (for disconnect or game end)
+    def remove_player(self, username):
+
+        for player in self.players:
+            if player.name == username:
+                
+                if player in self.dead_players:
+                    self.dead_players.remove(player)
+                self.players.remove(player)
+
     #check if there is only 1 remaining live player
     def check_end_game(self):
 
@@ -149,9 +159,11 @@ class LiarsBar:
         self.shuffle_deck()
 
         self.deal_cards()
-
-        self.active_player = self.players[0]
-
+        #if its the first round, player 1 starts, else continue in player (alive) order
+        if self.active_player == None:
+            self.active_player = self.players[0]
+        else:
+            self.active_player = self.get_next_player()
 
     def get_emit_data(self):
 

@@ -9,22 +9,26 @@ const username = ref("")
 const isError = ref(false)
 const errorMsg = ref("Username cannot be empty")
 
-// get the global socket from socket.js
-const socket = getSocket()
-
 //check for empty name, and proceed to game page if the playerName is valid
 function joinGame() {
 
     if (username.value.trim() === '') {
         isError.value = true
     }
+
     else {
         isError.value = false
+
+        // get the global socket from socket.js
+        const socket = getSocket()
+
+        //send the join request
         const data = {'name': username}
-        socket.emit('add_player', data)
+        // socket.emit('add_player', data)
         
+        //prevent stack error
         if (currRouter.currentRoute.value.path !== '/game') {
-            currRouter.push({ path: '/game' });
+            currRouter.push({ path: '/game', query: {username: username} });
         }
     }
 }
